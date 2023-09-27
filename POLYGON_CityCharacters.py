@@ -19,6 +19,7 @@ def import_characters():
     )
 
     # Textures pointing to the wrong directory. Fix that
+    # https://blender.stackexchange.com/a/280804
     for image in bpy.data.images.values():
         if image.source == "FILE":
             # Make absolute
