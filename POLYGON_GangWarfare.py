@@ -90,7 +90,7 @@ def import_characters():
             else:
                 # Make absolute
                 image.filepath = bpy.path.abspath(
-                    "//Source_Files\\Textures\\" + filename
+                    "//UnrealFBXs\\tex\\" + filename
                 )
 
 import_characters()
