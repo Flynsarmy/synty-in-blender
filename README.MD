@@ -18,7 +18,7 @@ At the time of writing I'll just be focusing on character imports but ideally th
 ## Installation
 
 * Download and extract the source files zip from your Synty vault.
-* Drop *POLYGON.blend* into the folder you just extracted. i.e if you extraced the City Characters zip, drop the file in your *POLYGON_CityCharacters_SourceFiles* folder.
+* Drop *POLYGON.blend* into the top level folder you just extracted. i.e if you extraced the City Characters zip, drop the file in your *POLYGON_CityCharacters_SourceFiles* folder. Do not place it in any subfolders further down.
 * Open the relevent python script from this repo for the pack you're working with and copy its contents.
 * Open the blend file, navigate to the *Scripting* tab at teh top, click *New*, paste and hit *Run Script*.
 
