@@ -41,9 +41,14 @@ def import_characters():
         if obj.type == 'MESH':
             # Always use non-duplicate version of material
             obj.active_material = bpy.data.materials[
-                # SK_Chr_Kid_Schoolboy_01 has a broken 'lambert3' material. Set it to
-                # the same as all the others
-                obj.active_material.name.replace("lambert3", "lambert2").split('.')[0]
+                obj
+                    .active_material.name
+                    # SK_Chr_Kid_Schoolboy_01 has a broken 'lambert3' material. Set it to
+                    # the same as all the others
+                    .replace("lambert3", "lambert2")
+                    # The eyes/eyebrows should also be on lambert2
+                    .replace("KIds", "lambert2")
+                    .split('.')[0]
             ]
 
             # Rename Meshes to be the same as their parent MeshObjects
@@ -94,4 +99,23 @@ def import_characters():
                     "//SourceFiles\\Textures\\PolygonKids_Texture_01_A.png"
                 )
 
+# Removed orphaned data
+def cleanup():
+    for block in bpy.data.meshes:
+        if block.users == 0:
+            bpy.data.meshes.remove(block)
+
+    for block in bpy.data.materials:
+        if block.users == 0:
+            bpy.data.materials.remove(block)
+
+    for block in bpy.data.textures:
+        if block.users == 0:
+            bpy.data.textures.remove(block)
+
+    for block in bpy.data.images:
+        if block.users == 0:
+            bpy.data.images.remove(block)
+
 import_characters()
+cleanup()
