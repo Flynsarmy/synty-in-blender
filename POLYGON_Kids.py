@@ -1,6 +1,5 @@
 import bpy
 import os
-import re
 
 def import_characters():
     # Deselect all
@@ -126,7 +125,6 @@ def import_weapons():
 
     # Find our character FBX's - https://blender.stackexchange.com/a/253543
     folder = bpy.path.abspath("//SourceFiles/FBX")
-#    fbxs = [f for f in os.listdir(folder) if re.match("^SK_Wep_.+\.fbx$", f)]
     fbxs = [f for f in os.listdir(folder) \
         if f.endswith(".fbx") \
         and (f.startswith("SK_Wep_") or f.startswith("SM_Wep_"))
