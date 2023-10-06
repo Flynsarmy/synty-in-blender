@@ -1,5 +1,6 @@
 import bpy
 import os
+import re
 
 def import_characters():
     # Deselect all
@@ -80,7 +81,6 @@ def import_characters():
     first_armature.name = "Armature"
 
 
-
 def import_attachments():
     # Deselect all
     bpy.ops.object.select_all(action='DESELECT')
@@ -126,7 +126,11 @@ def import_weapons():
 
     # Find our character FBX's - https://blender.stackexchange.com/a/253543
     folder = bpy.path.abspath("//SourceFiles/FBX")
-    fbxs = [f for f in os.listdir(folder) if f.endswith(".fbx") and f.startswith("SK_Wep_")]
+#    fbxs = [f for f in os.listdir(folder) if re.match("^SK_Wep_.+\.fbx$", f)]
+    fbxs = [f for f in os.listdir(folder) \
+        if f.endswith(".fbx") \
+        and (f.startswith("SK_Wep_") or f.startswith("SM_Wep_"))
+    ]
 
     collection = bpy.data.collections["Weapons"]
 
@@ -151,11 +155,27 @@ def import_weapons():
 
 
         if obj.type == 'MESH':
+            # The static mesh assets are sitting inside EMPTYs. Pull them out.
+            if obj.parent and obj.parent.type == 'EMPTY':
+                obj.parent = None
+
+            # Some objects are scaled 100x too large.
+            if obj.scale.x == 1.0:
+                obj.scale /= 100.0
+
             # Use the same material as the characters
             obj.active_material = bpy.data.materials["lambert2"]
 
             # Rename Meshes to be the same as their parent MeshObjects
             obj.data.name = obj.name
+
+    # Delete all EMPTYs
+    bpy.ops.object.select_all(action='DESELECT')
+    for obj in collection.objects:
+        if obj.type == 'EMPTY':
+            obj.select_set(True)
+    bpy.ops.object.delete()
+
 
 def fix_materials():
     # https://blender.stackexchange.com/a/280804
