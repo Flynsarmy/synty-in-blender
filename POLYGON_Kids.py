@@ -52,7 +52,7 @@ def import_characters():
             ]
 
             # Rename Meshes to be the same as their parent MeshObjects
-            obj.data.name = obj.name[7:]
+            obj.data.name = obj.name
 
 
             if first_armature != None and obj.modifiers[0].type == 'ARMATURE':
@@ -77,30 +77,110 @@ def import_characters():
     # Delete them
     bpy.ops.object.delete()
 
-    # Apply rotation, scale
-    for obj in collection.objects:
-        obj.select_set(True)
-    bpy.ops.object.transform_apply(scale=True, rotation=True)
-
     first_armature.name = "Armature"
 
-    # Eye/Eyebrow Textures pointing to the wrong directory. Fix that
+
+
+def import_attachments():
+    # Deselect all
+    bpy.ops.object.select_all(action='DESELECT')
+
+    # Highlight the 'Characters' collection - https://blender.stackexchange.com/a/248563
+    bpy.context.view_layer.active_layer_collection = \
+        bpy.context.view_layer.layer_collection.children['Character_Attachments']
+
+    # Find our character FBX's - https://blender.stackexchange.com/a/253543
+    folder = bpy.path.abspath("//SourceFiles/FBX")
+    fbxs = [f for f in os.listdir(folder) \
+        if f.endswith(".fbx") \
+        and (f.startswith("SM_Chr_Attach_") or f.startswith("SM_Chr_Hair"))
+    ]
+
+    collection = bpy.data.collections["Character_Attachments"]
+
+    # Import them
+    for fbx in fbxs:
+        bpy.ops.import_scene.fbx(
+            filepath=os.path.join(folder, fbx),
+            use_anim=False,
+            ignore_leaf_bones=True,
+            force_connect_children=True,
+            automatic_bone_orientation=True,
+        )
+
+    for obj in collection.objects:
+        if obj.type == 'MESH':
+            # Use the same material as the characters
+            obj.active_material = bpy.data.materials["lambert2"]
+
+            # Rename Meshes to be the same as their parent MeshObjects
+            obj.data.name = obj.name
+
+def import_weapons():
+    # Deselect all
+    bpy.ops.object.select_all(action='DESELECT')
+
+    # Highlight the 'Characters' collection - https://blender.stackexchange.com/a/248563
+    bpy.context.view_layer.active_layer_collection = \
+        bpy.context.view_layer.layer_collection.children['Weapons']
+
+    # Find our character FBX's - https://blender.stackexchange.com/a/253543
+    folder = bpy.path.abspath("//SourceFiles/FBX")
+    fbxs = [f for f in os.listdir(folder) if f.endswith(".fbx") and f.startswith("SK_Wep_")]
+
+    collection = bpy.data.collections["Weapons"]
+
+    # Import them
+    for fbx in fbxs:
+        bpy.ops.import_scene.fbx(
+            filepath=os.path.join(folder, fbx),
+            use_anim=False,
+            ignore_leaf_bones=True,
+            force_connect_children=True,
+            automatic_bone_orientation=True,
+        )
+
+    for obj in collection.objects:
+        # Rename any armatures to their first mesh object name
+        # So they're not just 'Armature'.
+        if obj.type == 'ARMATURE':
+            for obj2 in collection.objects:
+                if obj2.type == 'MESH' and obj2.parent == obj:
+                    obj.name = obj2.name
+                    break
+
+
+        if obj.type == 'MESH':
+            # Use the same material as the characters
+            obj.active_material = bpy.data.materials["lambert2"]
+
+            # Rename Meshes to be the same as their parent MeshObjects
+            obj.data.name = obj.name
+
+def fix_materials():
     # https://blender.stackexchange.com/a/280804
     for image in bpy.data.images.values():
         filename = os.path.basename(image.filepath)
         if image.source == "FILE":
+            # Eye/Eyebrow pointing to wrong file in wrong directory. Fix that
             if filename == "Polygon_Kids_Texture_Facial_Expression_Frown_Freckles_01.png":
                 # Make absolute
                 image.filepath = bpy.path.abspath(
                     "//SourceFiles\\Textures\\Faces_Human\\Normal\\Expression\\Polygon_Kids_Texture_Facial_Expression_Frown_01.png"
                 )
-            elif filename == "Polygon_Kids_Texture_A.png":
+            # Everything else goes to default texture
+            else:
                 image.filepath = bpy.path.abspath(
                     "//SourceFiles\\Textures\\PolygonKids_Texture_01_A.png"
                 )
 
-# Removed orphaned data
 def cleanup():
+    # Apply rotation, scale
+    for obj in bpy.data.objects:
+        obj.select_set(True)
+    bpy.ops.object.transform_apply(scale=True, rotation=True)
+
+    # Removed orphaned data
     for block in bpy.data.meshes:
         if block.users == 0:
             bpy.data.meshes.remove(block)
@@ -118,4 +198,7 @@ def cleanup():
             bpy.data.images.remove(block)
 
 import_characters()
+import_attachments()
+import_weapons()
+fix_materials()
 cleanup()
