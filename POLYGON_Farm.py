@@ -254,11 +254,23 @@ def import_props():
 
     for obj in collection.objects:
         if obj.type == 'MESH':
-            # Use the same material as the characters
-            obj.active_material = bpy.data.materials["lambert2"]
+            for material_slot in obj.material_slots:
+                # Always use non-duplicate version of material
+                material_slot.material = bpy.data.materials[
+                    material_slot.material.name.split('.')[0]
+                ]
+                # Use the same material as the characters
+                if (material_slot.material.name in [
+                        "Farm", "lambert1", "lambert23", "Vehicles", "Blade",
+                        "lambert861"
+                    ]) \
+                    or material_slot.material.name.startswith("Farm"):
+                    material_slot.material = bpy.data.materials["lambert2"]
+                elif material_slot.material.name in ["Leaves"]:
+                    material_slot.material = bpy.data.materials["lambert863"]
 
-            # Rename Meshes to be the same as their parent MeshObjects
-            obj.data.name = obj.name
+                # Rename Meshes to be the same as their parent MeshObjects
+                obj.data.name = obj.name
 
 def import_vehicles():
     # Deselect all
@@ -299,8 +311,15 @@ def import_vehicles():
 
     for obj in collection.objects:
         if obj.type == 'MESH':
+            # Always use non-duplicate version of material
+            obj.active_material = bpy.data.materials[
+                obj
+                    .active_material.name
+                    .split('.')[0]
+            ]
             # Use the same material as the characters
-            obj.active_material = bpy.data.materials["lambert2"]
+            if obj.active_material.name in ["lambert1", "lambert2"]:
+                obj.active_material = bpy.data.materials["lambert2"]
 
             # Rename Meshes to be the same as their parent MeshObjects
             obj.data.name = obj.name
@@ -311,11 +330,36 @@ def fix_materials():
     for image in bpy.data.images.values():
         filename = os.path.basename(image.filepath)
         if image.source == "FILE":
-            if filename == 'PolygonFarm_Texture_01_A.png':
-                # Eye/Eyebrow pointing to wrong file in wrong directory. Fix that
+            if filename in ['Fence_Alpha.tga', 'PolygonFarm_Texture_01_A.png', 'PolygonFarm_Signs.png']:
                 image.filepath = bpy.path.abspath(
-                    "//SourceFiles\\Textures\\PolygonFarm_Texture_01_A.png"
+                    "//SourceFiles\\Textures\\" + filename
                 )
+            elif filename == 'leavessheet_cavity.png':
+                image.filepath = bpy.path.abspath(
+                    "//SourceFiles\\Textures\\Leaves_Diff.tga"
+                )
+
+    # SM_Prop_Bush_Round_Row_01 creates a material 'lambert863' that needs its
+    # alpha and normal map fixed up.
+    for material in bpy.data.materials:
+           if material.name == 'lambert863':
+                # https://blender.stackexchange.com/a/129014
+                bsdf = material.node_tree.nodes["Principled BSDF"]
+
+                tex_image = material.node_tree.nodes.new('ShaderNodeTexImage')
+                tex_image.image = bpy.data.images.load(bpy.path.abspath(
+                    "//SourceFiles\\Textures\\Leaves_Diff.tga"
+                ))
+
+                norm_image = material.node_tree.nodes.new('ShaderNodeTexImage')
+                norm_image.image = bpy.data.images.load(bpy.path.abspath(
+                    "//SourceFiles\\Textures\\Leaves_Normals.png"
+                ))
+
+                normal_map = material.node_tree.nodes["Normal Map"]
+                material.node_tree.links.new(bsdf.inputs['Alpha'], tex_image.outputs['Alpha'])
+                material.node_tree.links.new(normal_map.inputs['Color'], norm_image.outputs['Color'])
+
 
 def cleanup():
     # Apply rotation, scale
