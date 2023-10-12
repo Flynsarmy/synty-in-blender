@@ -24,6 +24,14 @@ At the time of writing I'll just be focusing on character imports but ideally th
 
 > Note: The scripts aren't set up to import multiple packs into the one blend file. You'll need a separate blend file per pack.
 
+## Progress
+
+The following packs are complete with all assets importing, materials set up, scale applied etc:
+
+* Farm
+* City
+* City Characters
+
 ## Notes
 
 All packs will be imported into the following Collections:
