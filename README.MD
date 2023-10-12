@@ -28,9 +28,10 @@ At the time of writing I'll just be focusing on character imports but ideally th
 
 The following packs are complete with all assets importing, materials set up, scale applied etc:
 
-* Farm
+* Adventure
 * City
 * City Characters
+* Farm
 
 ## Notes
 
