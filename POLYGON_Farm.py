@@ -339,10 +339,11 @@ def fix_materials():
                     "//SourceFiles\\Textures\\Leaves_Diff.tga"
                 )
 
-    # SM_Prop_Bush_Round_Row_01 creates a material 'lambert863' that needs its
-    # alpha and normal map fixed up.
     for material in bpy.data.materials:
-           if material.name == 'lambert863':
+            # Leaves material
+            if material.name == 'lambert863':
+                material.name = "POLYGONFarm_Leaves"
+
                 # https://blender.stackexchange.com/a/129014
                 bsdf = material.node_tree.nodes["Principled BSDF"]
 
@@ -359,6 +360,56 @@ def fix_materials():
                 normal_map = material.node_tree.nodes["Normal Map"]
                 material.node_tree.links.new(bsdf.inputs['Alpha'], tex_image.outputs['Alpha'])
                 material.node_tree.links.new(normal_map.inputs['Color'], norm_image.outputs['Color'])
+
+                bsdf.inputs["Metallic"].default_value = 0.0
+                bsdf.inputs["Specular"].default_value = 0.2
+                bsdf.inputs["Roughness"].default_value = 0.8
+
+            # Glass material
+            elif material.name == 'lambert3':
+                material.name = "POLYGONFarm_Glass"
+
+                bsdf = material.node_tree.nodes["Principled BSDF"]
+
+                tex_image = material.node_tree.nodes.new('ShaderNodeTexImage')
+                tex_image.image = bpy.data.images.load(bpy.path.abspath(
+                    "//SourceFiles\\Textures\\PolygonFarm_Texture_01_A.png"
+                ))
+                material.node_tree.links.new(bsdf.inputs['Base Color'], tex_image.outputs['Color'])
+
+                bsdf.inputs["Metallic"].default_value = 0.0
+                bsdf.inputs["Specular"].default_value = 0.8
+                bsdf.inputs["Roughness"].default_value = 0.2
+                bsdf.inputs["Alpha"].default_value = 0.5
+
+            elif material.name == 'fence':
+                material.name = "POLYGONFarm_Fence"
+            elif material.name == 'lambert864':
+                material.name = "POLYGONFarm_Signs"
+
+                bsdf = material.node_tree.nodes["Principled BSDF"]
+                bsdf.inputs["Metallic"].default_value = 0.0
+                bsdf.inputs["Specular"].default_value = 0.2
+                bsdf.inputs["Roughness"].default_value = 0.8
+            elif material.name == 'lambert9':
+                material.name = "POLYGONFarm_Wire"
+
+                # https://blender.stackexchange.com/a/129014
+                bsdf = material.node_tree.nodes["Principled BSDF"]
+
+                alpha_tex = material.node_tree.nodes['Image Texture.001']
+                material.node_tree.links.new(bsdf.inputs['Alpha'], alpha_tex.outputs['Alpha'])
+
+                bsdf.inputs["Metallic"].default_value = 0.0
+                bsdf.inputs["Specular"].default_value = 0.2
+                bsdf.inputs["Roughness"].default_value = 0.8
+            elif material.name == 'lambert2':
+                material.name = "POLYGONFarm_Base"
+
+                bsdf = material.node_tree.nodes["Principled BSDF"]
+                bsdf.inputs["Metallic"].default_value = 0.0
+                bsdf.inputs["Specular"].default_value = 0.2
+                bsdf.inputs["Roughness"].default_value = 0.8
 
 
 def cleanup():
