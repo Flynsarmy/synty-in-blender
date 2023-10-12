@@ -269,8 +269,8 @@ def import_props():
                 elif material_slot.material.name in ["Leaves"]:
                     material_slot.material = bpy.data.materials["lambert863"]
 
-                # Rename Meshes to be the same as their parent MeshObjects
-                obj.data.name = obj.name
+            # Rename Meshes to be the same as their parent MeshObjects
+            obj.data.name = obj.name
 
 def import_vehicles():
     # Deselect all
