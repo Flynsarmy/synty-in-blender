@@ -108,12 +108,155 @@ def import_attachments():
         )
 
     for obj in collection.objects:
-        if obj.type == 'MESH':
-            # Use the same material as the characters
-            obj.active_material = bpy.data.materials["lambert2"]
+        for material_slot in obj.material_slots:
+            # Always use non-duplicate version of material
+            material_slot.material = bpy.data.materials[
+                material_slot.material.name.split('.')[0]
+            ]
+
+            # Remove duplicate glass materials
+            if material_slot.material.name in [
+                "lambert1431", "lambert1440", "paintballMask_GlassSHD", "_Glass_kids"
+            ]:
+                material_slot.material = bpy.data.materials["lambert1431"]
+            else:
+                # Use the base material for everything else
+                material_slot.material = bpy.data.materials["lambert2"]
 
             # Rename Meshes to be the same as their parent MeshObjects
             obj.data.name = obj.name
+
+
+def import_environments():
+    # Deselect all
+    bpy.ops.object.select_all(action='DESELECT')
+
+    # Highlight the 'Characters' collection - https://blender.stackexchange.com/a/248563
+    bpy.context.view_layer.active_layer_collection = \
+        bpy.context.view_layer.layer_collection.children['Environments']
+
+    # Find our character FBX's - https://blender.stackexchange.com/a/253543
+    folder = bpy.path.abspath("//SourceFiles/FBX")
+    fbxs = [f for f in os.listdir(folder) \
+        if f.endswith(".fbx") and (f.startswith("SM_Env_") or f.startswith("SM_Generic_"))
+    ]
+
+    collection = bpy.data.collections["Environments"]
+
+    # Import them
+    for fbx in fbxs:
+        bpy.ops.import_scene.fbx(
+            filepath=os.path.join(folder, fbx),
+            use_anim=False,
+            ignore_leaf_bones=True,
+            force_connect_children=True,
+            automatic_bone_orientation=True,
+        )
+
+    for obj in collection.objects:
+        if obj.type == 'MESH':
+            for material_slot in obj.material_slots:
+                # Always use non-duplicate version of material
+                material_slot.material = bpy.data.materials[
+                    material_slot.material.name.split('.')[0]
+                ]
+
+                if material_slot.material.name == "GlassSHD":
+                    material_slot.material = bpy.data.materials["lambert1431"]
+                else:
+                    material_slot.material = bpy.data.materials["lambert2"]
+
+            # Rename Meshes to be the same as their parent MeshObjects
+            obj.data.name = obj.name
+
+
+def import_props():
+    # Deselect all
+    bpy.ops.object.select_all(action='DESELECT')
+
+    # Highlight the 'Characters' collection - https://blender.stackexchange.com/a/248563
+    bpy.context.view_layer.active_layer_collection = \
+        bpy.context.view_layer.layer_collection.children['Props']
+
+    # Find our character FBX's - https://blender.stackexchange.com/a/253543
+    folder = bpy.path.abspath("//SourceFiles/FBX")
+    fbxs = [f for f in os.listdir(folder) \
+        if f.endswith(".fbx") \
+        and (f.startswith("SM_Prop_") or f.startswith("SK_Prop_"))
+    ]
+
+    collection = bpy.data.collections["Props"]
+
+    # Import them
+    for fbx in fbxs:
+        bpy.ops.import_scene.fbx(
+            filepath=os.path.join(folder, fbx),
+            use_anim=False,
+            ignore_leaf_bones=True,
+            force_connect_children=True,
+            automatic_bone_orientation=True,
+        )
+
+    for obj in collection.objects:
+        if obj.type == 'MESH':
+            for material_slot in obj.material_slots:
+                # Always use non-duplicate version of material
+                material_slot.material = bpy.data.materials[
+                    material_slot.material.name.split('.')[0]
+                ]
+
+                if material_slot.material.name.startswith("Glass"):
+                    material_slot.material = bpy.data.materials["lambert1431"]
+                else:
+                    material_slot.material = bpy.data.materials["lambert2"]
+
+            # Rename Meshes to be the same as their parent MeshObjects
+            obj.data.name = obj.name
+
+
+def import_vehicles():
+    # Deselect all
+    bpy.ops.object.select_all(action='DESELECT')
+
+    # Highlight the 'Characters' collection - https://blender.stackexchange.com/a/248563
+    bpy.context.view_layer.active_layer_collection = \
+        bpy.context.view_layer.layer_collection.children['Vehicles']
+
+    # Find our character FBX's - https://blender.stackexchange.com/a/253543
+    folder = bpy.path.abspath("//SourceFiles/FBX")
+    fbxs = [f for f in os.listdir(folder) \
+        if f.endswith(".fbx") \
+        and (f.startswith("SM_Veh_") or f.startswith("SK_Veh_"))
+    ]
+
+    collection = bpy.data.collections["Vehicles"]
+
+    # Import them
+    for fbx in fbxs:
+        bpy.ops.import_scene.fbx(
+            filepath=os.path.join(folder, fbx),
+            use_anim=False,
+            ignore_leaf_bones=True,
+            force_connect_children=True,
+            automatic_bone_orientation=True,
+        )
+
+    for obj in collection.objects:
+        if obj.type == 'MESH':
+            for material_slot in obj.material_slots:
+                # Always use non-duplicate version of material
+                material_slot.material = bpy.data.materials[
+                    material_slot.material.name.split('.')[0]
+                ]
+
+                if material_slot.material.name.startswith("Glass"):
+                    material_slot.material = bpy.data.materials["lambert1431"]
+                else:
+                    material_slot.material = bpy.data.materials["lambert2"]
+
+            # Rename Meshes to be the same as their parent MeshObjects
+            obj.data.name = obj.name
+
 
 def import_weapons():
     # Deselect all
@@ -161,8 +304,13 @@ def import_weapons():
             if obj.scale.x == 1.0:
                 obj.scale /= 100.0
 
-            # Use the same material as the characters
-            obj.active_material = bpy.data.materials["lambert2"]
+            for material_slot in obj.material_slots:
+                # Always use non-duplicate version of material
+                material_slot.material = bpy.data.materials[
+                    material_slot.material.name.split('.')[0]
+                ]
+                # Use the same material as the characters
+                material_slot.material = bpy.data.materials["lambert2"]
 
             # Rename Meshes to be the same as their parent MeshObjects
             obj.data.name = obj.name
@@ -184,13 +332,31 @@ def fix_materials():
             if filename == "Polygon_Kids_Texture_Facial_Expression_Frown_Freckles_01.png":
                 # Make absolute
                 image.filepath = bpy.path.abspath(
-                    "//SourceFiles\\Textures\\Faces_Human\\Normal\\Expression\\Polygon_Kids_Texture_Facial_Expression_Frown_01.png"
+                    "//SourceFiles/Textures/Faces_Human/Normal/Expression/Polygon_Kids_Texture_Facial_Expression_Frown_01.png"
                 )
-            # Everything else goes to default texture
-            else:
+            elif filename == "Polygon_Kids_Texture_A _Justin.psd":
                 image.filepath = bpy.path.abspath(
-                    "//SourceFiles\\Textures\\PolygonKids_Texture_01_A.png"
+                    "//SourceFiles/Textures/PolygonKids_Texture_01_A.png"
                 )
+
+    for material in bpy.data.materials:
+        if material.name == 'lambert2':
+            material.name = 'POLYGONKids_Base'
+
+            # https://blender.stackexchange.com/a/129014
+            bsdf = material.node_tree.nodes["Principled BSDF"]
+            bsdf.inputs["Metallic"].default_value = 0.0
+            bsdf.inputs["Specular"].default_value = 0.2
+            bsdf.inputs["Roughness"].default_value = 0.8
+        elif material.name == 'lambert1431':
+            material.name = 'POLYGONKids_Glass'
+
+            # https://blender.stackexchange.com/a/129014
+            bsdf = material.node_tree.nodes["Principled BSDF"]
+            bsdf.inputs["Metallic"].default_value = 0.0
+            bsdf.inputs["Specular"].default_value = 0.2
+            bsdf.inputs["Roughness"].default_value = 0.8
+            bsdf.inputs["Alpha"].default_value = 0.5
 
 def cleanup():
     # Apply rotation, scale
@@ -217,6 +383,9 @@ def cleanup():
 
 import_characters()
 import_attachments()
+import_environments()
+import_props()
+import_vehicles()
 import_weapons()
 fix_materials()
 cleanup()

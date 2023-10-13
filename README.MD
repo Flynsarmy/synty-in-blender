@@ -32,6 +32,7 @@ The following packs are complete with all assets importing, materials set up, sc
 * City
 * City Characters
 * Farm
+* Kids
 
 ## Notes
 
