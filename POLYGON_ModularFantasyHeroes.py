@@ -131,6 +131,10 @@ def fix_materials():
                     "//Source_Files/Textures/PolygonFantasyHero_Texture_01.png"
                 )
 
+    for material in bpy.data.materials:
+        if material.name == 'lambert2':
+            material.name = 'POLYGONModularFantasyHeroes_Base'
+
 def cleanup():
     # Apply rotation, scale
     for obj in bpy.data.objects:
