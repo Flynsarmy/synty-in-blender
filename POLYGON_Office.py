@@ -258,7 +258,7 @@ def fix_materials():
             # https://blender.stackexchange.com/a/129014
             bsdf = material.node_tree.nodes["Principled BSDF"]
             bsdf.inputs["Metallic"].default_value = 0.0
-            bsdf.inputs["Specular"].default_value = 0.2
+            bsdf.inputs["Specular IOR Level"].default_value = 0.2
             bsdf.inputs["Roughness"].default_value = 0.8
 
             tex_emissive = material.node_tree.nodes.new('ShaderNodeTexImage')
@@ -291,7 +291,7 @@ def fix_materials():
                 "//SourceFiles/Textures/PolygonOffice_Texture_Sceen_Arcade_01.png"
             ))
             material.node_tree.links.new(bsdf.inputs['Base Color'], tex_albedo.outputs['Color'])
-            material.node_tree.links.new(bsdf.inputs['Emission'], tex_albedo.outputs['Color'])
+            material.node_tree.links.new(bsdf.inputs['Emission Color'], tex_albedo.outputs['Color'])
 
         # Set up the 5 Screen materials
         for i in range(1, 4):
@@ -304,7 +304,7 @@ def fix_materials():
                     "//SourceFiles/Textures/PolygonOffice_Texture_Sceen_0" + str(i) + ".png"
                 ))
                 material.node_tree.links.new(bsdf.inputs['Base Color'], tex_albedo.outputs['Color'])
-                material.node_tree.links.new(bsdf.inputs['Emission'], tex_albedo.outputs['Color'])
+                material.node_tree.links.new(bsdf.inputs['Emission Color'], tex_albedo.outputs['Color'])
 
 
 
